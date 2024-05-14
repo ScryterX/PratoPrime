@@ -6,6 +6,7 @@ import { Button } from "./_components/ui/button";
 import { ChevronRightIcon } from "lucide-react";
 import { db } from "./_lib/prisma";
 import PromoBanner from "./_components/promo-banner";
+import RestaurantList from "./_components/restaurant-list";
 
 const Home = async () => {
   const products = await db.product.findMany({
@@ -59,6 +60,20 @@ const Home = async () => {
           src="/banner-promo-02.gif"
           alt="O melhor churrasco que você já comeu"
         />
+      </div>
+
+      <div className="space-y-4 pt-6">
+        <div className="flex items-center justify-between px-5 ">
+          <h2 className="font-semibold">Restaurantes recomendados</h2>
+          <Button
+            className="h-fit p-0 text-primary hover:bg-transparent"
+            variant={"ghost"}
+          >
+            Ver todos
+            <ChevronRightIcon size={16} />
+          </Button>
+        </div>
+        <RestaurantList />
       </div>
     </>
   );
