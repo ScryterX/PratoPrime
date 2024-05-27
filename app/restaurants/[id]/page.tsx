@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { db } from "../../_lib/prisma";
 import RestaurantImage from "./_components/restaurant-image";
 import RestaurantDetails from "./_components/restaurant-details";
+import CartBanner from "./_components/cart-banner";
 
 interface RestaurantPageProp {
   params: {
@@ -49,6 +50,7 @@ const RestaurantPage = async ({ params: { id } }: RestaurantPageProp) => {
     <div className="">
       <RestaurantImage restaurant={restaurant} />
       <RestaurantDetails restaurant={restaurant} />
+      <CartBanner restaurant={restaurant} />
     </div>
   );
 };
