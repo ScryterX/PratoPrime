@@ -8,15 +8,18 @@ interface RestaurantPageProp {
     id: string;
   };
 }
-const RestaurantPage = async ({ params }: RestaurantPageProp) => {
+const RestaurantPage = async ({ params: { id } }: RestaurantPageProp) => {
   const restaurant = await db.restaurant.findUnique({
     where: {
-      id: params.id,
+      id: id,
     },
     include: {
       categories: {
         include: {
           products: {
+            where: {
+              RestaurantId: id,
+            },
             include: {
               restaurant: {
                 select: {
