@@ -1,16 +1,62 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CartContext } from "../_context/cart";
 import CartItem from "./cart-item";
 import { Card, CardContent } from "./ui/card";
 import { formatCurrency } from "../_helpers/price";
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
-import { ShoppingBagIcon } from "lucide-react";
+import { Loader2, ShoppingBagIcon } from "lucide-react";
+import { createOrder } from "../_actions/order";
+import { OrderStatus } from "@prisma/client";
+import { useSession } from "next-auth/react";
+
+import {
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "./ui/alert-dialog";
 
 const Cart = () => {
-  const { products, subtotalPrice, totalPrice, totalDiscounts } =
+  const { products, subtotalPrice, totalPrice, totalDiscounts, clearCart } =
     useContext(CartContext);
   const deliveryFee = products[0]?.restaurant?.deliveryFee;
+  const { data } = useSession();
+
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+  const [isConfirmDialogOpen, setisConfirmDialogOpen] = useState(false);
+
+  const handleFinishOrderClick = async () => {
+    if (!data?.user) return;
+    const restaurant = products[0].restaurant;
+
+    try {
+      setIsSubmitLoading(true);
+      await createOrder({
+        subtotalPrice,
+        totalDiscounts,
+        totalPrice,
+        deliveryFee: restaurant.deliveryFee, // TODO: get delivery fee from restaurant
+        deliveryTimeMinutes: restaurant.deliveryTimeMinutes,
+        restaurant: {
+          connect: { id: restaurant.id },
+        },
+        status: OrderStatus.PREPARING,
+        user: {
+          connect: { id: data?.user.id },
+        },
+      });
+      clearCart();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitLoading(false);
+    }
+  };
   return (
     <>
       <div className="flex h-full flex-col py-5">
@@ -83,14 +129,29 @@ const Cart = () => {
         </div>
 
         {products.length > 0 ? (
-          <>
-            <div className="mt-6">
-              <Button className="w-full gap-2">
-                <ShoppingBagIcon />
-                Finalizar pedido
-              </Button>
-            </div>
-          </>
+          isSubmitLoading ? (
+            <>
+              <div className="mt-6">
+                <Button disabled className="w-full gap-2">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <ShoppingBagIcon />
+                  Finalizar pedido
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mt-6">
+                <Button
+                  className="w-full gap-2"
+                  onClick={() => setisConfirmDialogOpen(true)}
+                >
+                  <ShoppingBagIcon />
+                  Finalizar pedido
+                </Button>
+              </div>
+            </>
+          )
         ) : (
           <>
             <div className="mt-6">
@@ -101,6 +162,27 @@ const Cart = () => {
             </div>
           </>
         )}
+
+        <AlertDialog
+          open={isConfirmDialogOpen}
+          onOpenChange={setisConfirmDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Deseja finalizar seu pedido?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Ao finalizar seu pedido, você concorda com os termos e condições
+                da nossa plataforma.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleFinishOrderClick}>
+                Finalizar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </>
   );

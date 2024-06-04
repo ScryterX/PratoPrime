@@ -48,8 +48,6 @@ const ProductDetails = ({
 
   const { addProductToCart, products } = useContext(CartContext);
 
-  console.log(products);
-
   const AddToCart = ({ emptyCart = false }: { emptyCart?: boolean }) => {
     addProductToCart({ product, quantity, emptyCart });
     setShowCart(true);

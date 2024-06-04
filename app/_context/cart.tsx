@@ -10,7 +10,9 @@ export interface CartProduct
     include: {
       restaurant: {
         select: {
+          id: true;
           deliveryFee: true;
+          deliveryTimeMinutes: true;
         };
       };
     };
@@ -45,6 +47,7 @@ interface iCartContext {
   decreaseProductQuantityInCart: (productId: string) => void;
   increaseProductQuantityInCart: (productId: string) => void;
   removeProductFromCart: (productId: string) => void;
+  clearCart: () => void;
 }
 
 export const CartContext = createContext<iCartContext>({
@@ -57,6 +60,7 @@ export const CartContext = createContext<iCartContext>({
   decreaseProductQuantityInCart: () => {},
   increaseProductQuantityInCart: () => {},
   removeProductFromCart: () => {},
+  clearCart: () => {},
 });
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
@@ -85,6 +89,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const totalDiscounts =
     subtotalPrice - totalPrice + Number(products?.[0]?.restaurant?.deliveryFee);
 
+  const clearCart = () => {
+    return setProducts([]);
+  };
   const decreaseProductQuantityInCart = (productId: string) => {
     return setProducts((prev) =>
       prev.map((cartProduct) => {
@@ -176,6 +183,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         totalPrice,
         totalDiscounts,
         totalQuantity,
+        clearCart,
         addProductToCart,
         decreaseProductQuantityInCart,
         increaseProductQuantityInCart,
