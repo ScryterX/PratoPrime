@@ -45,9 +45,17 @@ const Cart = () => {
         restaurant: {
           connect: { id: restaurant.id },
         },
-        status: OrderStatus.PREPARING,
+        status: OrderStatus.CONFIRMED,
         user: {
           connect: { id: data?.user.id },
+        },
+        products: {
+          createMany: {
+            data: products.map((product) => ({
+              ProductId: product.id,
+              quantity: product.quantity,
+            })),
+          },
         },
       });
       clearCart();

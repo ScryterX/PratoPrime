@@ -33,33 +33,42 @@ model Category {
 }
 
 model Product {
-  id                 String     @id @default(uuid())
+  id                 String         @id @default(uuid())
   name               String
   imageUrl           String
   description        String
-  price              Decimal    @db.Decimal(10, 2)
-  discountPercentage Int        @default(0)
+  price              Decimal        @db.Decimal(10, 2)
+  discountPercentage Int            @default(0)
   RestaurantId       String
-  restaurant         Restaurant @relation(fields: [RestaurantId], references: [id])
+  restaurant         Restaurant     @relation(fields: [RestaurantId], references: [id])
   categoryId         String
-  orders             Order[]
-  category           Category   @relation(fields: [categoryId], references: id)
+  category           Category       @relation(fields: [categoryId], references: id)
+  orderProducts      OrderProduct[]
+}
+
+model OrderProduct {
+  id        String  @id @default(uuid())
+  quantity  Int
+  OrderId   String
+  order     Order   @relation(fields: [OrderId], references: [id])
+  ProductId String
+  product   Product @relation(fields: [ProductId], references: [id])
 }
 
 model Order {
-  id                  String      @id @default(uuid())
+  id                  String         @id @default(uuid())
   userId              String
-  user                User        @relation(fields: [userId], references: [id])
-  products            Product[]
-  restaurant          Restaurant  @relation(fields: [restaurantId], references: [id])
+  user                User           @relation(fields: [userId], references: [id])
+  products            OrderProduct[]
+  restaurant          Restaurant     @relation(fields: [restaurantId], references: [id])
   restaurantId        String
-  deliveryFee         Decimal     @db.Decimal(10, 2)
+  deliveryFee         Decimal        @db.Decimal(10, 2)
   deliveryTimeMinutes Int
-  subtotalPrice       Decimal     @db.Decimal(10, 2)
-  totalPrice          Decimal     @db.Decimal(10, 2)
-  totalDiscounts      Decimal     @db.Decimal(10, 2)
+  subtotalPrice       Decimal        @db.Decimal(10, 2)
+  totalPrice          Decimal        @db.Decimal(10, 2)
+  totalDiscounts      Decimal        @db.Decimal(10, 2)
   status              OrderStatus
-  createdAt           DateTime    @default(now())
+  createdAt           DateTime       @default(now())
 }
 
 enum OrderStatus {
