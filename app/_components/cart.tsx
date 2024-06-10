@@ -20,8 +20,14 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "./ui/alert-dialog";
-
-const Cart = () => {
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+interface CartProps {
+  // eslint-disable-next-line no-unused-vars
+  setIsOpen: (isOpen: boolean) => void;
+}
+const Cart = ({ setIsOpen }: CartProps) => {
+  const router = useRouter();
   const { products, subtotalPrice, totalPrice, totalDiscounts, clearCart } =
     useContext(CartContext);
   const deliveryFee = products[0]?.restaurant?.deliveryFee;
@@ -59,6 +65,15 @@ const Cart = () => {
         },
       });
       clearCart();
+      setIsOpen(false);
+
+      toast("Pedido finalizado com sucesso!", {
+        description: "Você pode acompanhá-lo na página de pedidos",
+        action: {
+          label: "Ver mais",
+          onClick: () => router.push("/orders"),
+        },
+      });
     } catch (error) {
       console.error(error);
     } finally {
