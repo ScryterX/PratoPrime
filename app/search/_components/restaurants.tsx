@@ -3,11 +3,15 @@
 import { notFound, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { searchForRestaurant } from "../_actions/search";
-import { Restaurant } from "@prisma/client";
+import { Restaurant, UserFavoriteRestaurant } from "@prisma/client";
 import Header from "@/app/_components/Header";
 import RestaurantItem from "@/app/_components/restaurant-item";
-
-const RestaurantSearch = () => {
+interface RestaurantSearchProp {
+  userFavoriteRestaurants: UserFavoriteRestaurant[];
+}
+const RestaurantSearch = ({
+  userFavoriteRestaurants,
+}: RestaurantSearchProp) => {
   const searchParams = useSearchParams();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const searchFor = searchParams.get("q");
@@ -33,6 +37,7 @@ const RestaurantSearch = () => {
               className="min-w-full max-w-full"
               key={restaurant.id}
               restaurant={restaurant}
+              userFavoriteRestaurants={userFavoriteRestaurants}
             />
           ))}
         </div>
