@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 import { Loader2, ShoppingBagIcon } from "lucide-react";
 import { createOrder } from "../_actions/order";
 import { OrderStatus } from "@prisma/client";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 import {
   AlertDialogHeader,
@@ -80,6 +80,18 @@ const Cart = ({ setIsOpen }: CartProps) => {
       setIsSubmitLoading(false);
     }
   };
+
+  const handleCheckLoginCheckout = () => {
+    if (!data?.user) {
+      return toast.error("Você precisa estar logado para fazer esta ação", {
+        description:
+          "A comida não pode esperar, mas primeiro precisamos saber para quem entregar",
+        action: { label: "Logar", onClick: () => signIn() },
+      });
+    }
+    setisConfirmDialogOpen(true);
+  };
+
   return (
     <>
       <div className="flex h-full flex-col py-5">
@@ -167,7 +179,7 @@ const Cart = ({ setIsOpen }: CartProps) => {
               <div className="mt-6">
                 <Button
                   className="w-full gap-2"
-                  onClick={() => setisConfirmDialogOpen(true)}
+                  onClick={handleCheckLoginCheckout}
                 >
                   <ShoppingBagIcon />
                   Finalizar pedido
