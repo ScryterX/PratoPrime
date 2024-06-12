@@ -97,9 +97,12 @@ const Header = () => {
                   <Button
                     variant={"ghost"}
                     className="w-full justify-start space-x-3 rounded-full text-sm font-normal"
+                    asChild
                   >
-                    <StarIcon />{" "}
-                    <span className="block">Restaurantes favoritos</span>
+                    <Link href={"/restaurants/favorites"}>
+                      <StarIcon />{" "}
+                      <span className="block">Restaurantes favoritos</span>
+                    </Link>
                   </Button>
                 </div>
 

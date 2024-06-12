@@ -26,10 +26,12 @@ export const toggleFavoriteRestaurant = async (
     revalidatePath("/");
     return;
   }
-  return db.userFavoriteRestaurant.create({
+  await db.userFavoriteRestaurant.create({
     data: {
       userId,
       restaurantId,
     },
   });
+
+  revalidatePath("/");
 };
